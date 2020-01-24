@@ -127,6 +127,10 @@ class Document(dict):
     def find_one(cls, query={}):
         return cls.collection.find_one(query)
 
+    @classmethod
+    def get_by_id(cls, str_mongo_id):
+        return cls.collection.find_one({"_id": ObjectId(str_mongo_id)})
+
 
 class Post(Document):
     collection = mongo.db.Post
@@ -135,7 +139,7 @@ class Post(Document):
         self.title = title
         self.content = content
         self.author = author
-        self.date_posted=datetime.utcnow()
+        self.date_posted = datetime.utcnow()
         self._id = _id
 
     def get_id(self):

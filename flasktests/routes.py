@@ -4,32 +4,17 @@ from flasktests import app, bcrypt
 from flasktests.forms import RegistrationForm, LoginForm, PostForm
 from flasktests.models import User, Post
 
-posts = [
-    {
-        'author': 'Corey Schafer',
-        'title': 'Blog Post 1',
-        'content': 'First post content',
-        'date_posted': 'April 20, 2018'
-    },
-    {
-        'author': 'Jane Doe',
-        'title': 'Blog Post 2',
-        'content': 'Second post content',
-        'date_posted': 'April 21, 2018'
-    }
-]
-
 
 @app.route("/")
 @app.route("/home")
 def home():
-    posts_db=Post.find()
-    print("posts_db  "  , posts_db)
-    posts=[]
-    for post in posts_db :
-        print("post.author " , post['author'])
-        post_user=User.get_by_id(post['author'])
-        post['username']= post_user.username
+    posts_db = Post.find()
+    # print("posts_db  "  , posts_db)
+    posts = []
+    for post in posts_db:
+        # print("post.author " , post['author'])
+        post_user = User.get_by_id(post['author'])
+        post['username'] = post_user.username
         posts.append(post)
     return render_template('home.html', posts=posts)
 
@@ -101,9 +86,37 @@ def new_post():
     if form.validate_on_submit():
         title = form.title.data
         content = form.content.data
-        new_post=Post(title,content, current_user.get_id())
-        print ( title,content, current_user.get_id() )
+        new_post = Post(title, content, current_user.get_id())
+        # print(title, content, current_user.get_id())
         new_post.save()
         flash('Your post has been created!', 'success')
         return redirect(url_for('home'))
     return render_template('create_post.html', title='New Post', form=form, legend='New Post')
+
+
+@app.route("/post/<string:post_id>")
+def post(post_id):
+    post = Post.get_by_id(post_id)
+    # print("posts  ", post)
+    post_user = User.get_by_id(post['author'])
+    # print(post_user.username)
+    post['username'] = post_user.username
+    # print(current_user._id)
+    # print(post['author'])
+    return render_template('post.html', post=post)
+
+
+@app.route("/user/<string:username>")
+def user_posts(username):
+
+    user_name = User.get_by_id(username)
+    user = user_name.username
+    posts_db = Post.find({"author": username})
+    post_count = posts_db.count()
+    posts = []
+    for post in posts_db:
+        # print("post.author " , post['author'])
+        post_user = User.get_by_id(post['author'])
+        post['username'] = post_user.username
+        posts.append(post)
+    return render_template('user_posts.html', user=user, posts=posts, post_count=post_count)
