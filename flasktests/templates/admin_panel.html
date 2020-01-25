@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+  <table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Id</th>
+      <th scope="col">Username</th>
+      <th scope="col">Email</th>
+      <th scope="col">No of post </th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for user in users %}
+    <tr>
+      <th scope="row">{{ user._id }}</th>
+      <td>{{ user.username }}</td>
+      <td>{{ user.email }}</td>
+      <td>{{ user.total}}</td>
+    </tr>
+   {% endfor %}
+  </tbody>
+</table>
+{% endblock content %}

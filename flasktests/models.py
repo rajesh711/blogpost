@@ -59,6 +59,10 @@ class User(UserMixin):
             return cls(**data)
         return None
 
+    @classmethod
+    def get_all(cls, query={}):
+        return mongo.db.User.find(query)
+
     @staticmethod
     def login_valid(email, password):
         verify_user = User.get_by_email(email)
@@ -73,6 +77,15 @@ class User(UserMixin):
             new_user = cls(username, email, password, image=image, authenticated=authenticated, active=active,
                            anonymous=anonymous)
             new_user.save_to_mongo()
+            return True
+        else:
+            return False
+
+    @classmethod
+    def update_by_user_id(cls, str_mongo_id, new_val):
+        print(new_val)
+        data = mongo.db.update_one({"_id": ObjectId(str_mongo_id)}, {"$set": new_val})
+        if data:
             return True
         else:
             return False
@@ -130,6 +143,22 @@ class Document(dict):
     @classmethod
     def get_by_id(cls, str_mongo_id):
         return cls.collection.find_one({"_id": ObjectId(str_mongo_id)})
+
+    @classmethod
+    def delete_by_id(cls, str_mongo_id):
+        data = cls.collection.delete_one({"_id": ObjectId(str_mongo_id)})
+        if data:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def update_by_id(cls, str_mongo_id, new_val):
+        data = cls.collection.update_one({"_id": ObjectId(str_mongo_id)}, {"$set": new_val})
+        if data:
+            return True
+        else:
+            return False
 
 
 class Post(Document):
