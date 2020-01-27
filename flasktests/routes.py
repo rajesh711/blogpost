@@ -60,10 +60,6 @@ def login():
         user = User.get_by_email(email)
 
         if user and bcrypt.check_password_hash(user.password, form.password.data):
-            # print("user", user)
-            # from flask import current_app
-            # print("userid: ", getattr(user, current_app.login_manager.id_attribute)())
-            # print("user type ", type(user))
 
             login_user(user, remember=form.remember.data)
             return redirect(url_for('home'))
@@ -82,11 +78,12 @@ def account():
             current_user.image = picture_file
         current_user.username = form.username.data
         current_user.email = form.email.data
-        user_id = current_user._id
+        user_id = current_user.get_id()
+        print(user_id)
         result = User.get_by_id(user_id)
-        print(result)
+        new_val = {"username": current_user.username, "email": current_user.email, "image": current_user.image}
 
-        # User.update_by_user_id(current_user._id, user)
+        User.update_by_user_id(user_id, new_val)
         flash('Your account has been updated!', 'success')
         return redirect(url_for('account'))
     elif request.method == 'GET':
@@ -161,7 +158,7 @@ def admin():
     user_data = User.get_all()
     users = []
     for user in user_data:
-        post = Post.find({"author": user['_id']})
+        post = Post.find({"author": str(user['_id'])})
         total_post = post.count()
         user['total'] = total_post
         users.append(user)
@@ -183,6 +180,7 @@ def delete_post(post_id):
 @login_required
 def update_post(post_id):
     post = Post.get_by_id(post_id)
+    print(type(post))
     if post['author'] != current_user.get_id():
         abort(403)
     form = PostForm()

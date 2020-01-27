@@ -84,7 +84,7 @@ class User(UserMixin):
     @classmethod
     def update_by_user_id(cls, str_mongo_id, new_val):
         print(new_val)
-        data = mongo.db.update_one({"_id": ObjectId(str_mongo_id)}, {"$set": new_val})
+        data = mongo.db.User.update_one({"_id": ObjectId(str_mongo_id)}, {"$set": new_val})
         if data:
             return True
         else:
