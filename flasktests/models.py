@@ -1,6 +1,4 @@
 from datetime import datetime
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask import current_app
 from flask_login import UserMixin
 from bson.objectid import ObjectId
 from flasktests import login_manager, bcrypt, mongo
@@ -12,7 +10,7 @@ def load_user(user_id):
 
 
 class User(UserMixin):
-    def __init__(self, username, email, password, image="default.jpg", authenticated=True, active=True,
+    def __init__(self, username, email, password=None, image="default.jpg", authenticated=True, active=True,
                  anonymous=False, _id=None):
         self.username = username
         self.email = email
@@ -55,6 +53,13 @@ class User(UserMixin):
     @classmethod
     def get_by_id(cls, str_mongo_id):
         data = mongo.db.User.find_one({"_id": ObjectId(str_mongo_id)})
+        if data is not None:
+            return cls(**data)
+        return None
+
+    @classmethod
+    def get_by_id_with_projection(cls, str_mongo_id):
+        data = mongo.db.User.find_one({"_id": ObjectId(str_mongo_id)}, {"password": 0})
         if data is not None:
             return cls(**data)
         return None
